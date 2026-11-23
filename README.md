@@ -5,6 +5,9 @@ NGO FinanceFlow is a standalone functional prototype exploring how an NGO could 
 
 The concept focuses on a practical operational challenge: tracking programme budgets and expenditure across a Results Framework and multiple funding sources, while coordinating expense requests, programme review and finance processing.
 
+NGO FinanceFlow — Interactive Demo
+Open the interactive FinanceFlow prototype: https://annbell-ngo.github.io/NGO-FinanceFlow/
+
 ## What the prototype demonstrates
 
 - **Role-based workspaces** for Requester, Programme Officer, Management and Finance Officer.
