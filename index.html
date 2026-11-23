@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>NGO FinanceFlow v3</title>
+<style>
+:root{--navy:#172b4d;--blue:#315efb;--ink:#182230;--muted:#667085;--line:#e5e9ef;--bg:#f5f7fa;--green:#16845b;--amber:#9a5b00;--red:#b42318}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 Inter,system-ui,-apple-system,Segoe UI,sans-serif}header{background:var(--navy);color:#fff;padding:16px 25px;display:flex;justify-content:space-between;align-items:center;gap:12px}.brand{font-size:19px;font-weight:750}.tag{font-size:12px;color:#cbd5e1}.rolebox{display:flex;align-items:center;gap:8px;font-size:12px}.rolebox select{width:auto;min-width:170px}
+main{max-width:1200px;margin:22px auto;padding:0 17px}.tabs{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:16px}.tab{background:white;border:1px solid var(--line);border-radius:8px;padding:9px 12px;cursor:pointer;font-weight:650;color:#344054}.tab.active{background:#edf2ff;border-color:#b9c8ff;color:#2449d8}
+.page{display:none}.page.active{display:block}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.card,.panel{background:white;border:1px solid var(--line);border-radius:11px;padding:16px;margin-bottom:13px;box-shadow:0 1px 2px #10182808}.k{font-size:12px;color:var(--muted)}.v{font-size:24px;font-weight:750;margin:5px 0}h2{font-size:16px;margin:0 0 12px}h3{font-size:14px;margin:0 0 9px}.muted,small{color:var(--muted)}.two{display:grid;grid-template-columns:1fr 1fr;gap:13px}.three{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line);font-size:12px;vertical-align:top}th{color:var(--muted);background:#fafbfc}.pill{display:inline-block;padding:3px 8px;border-radius:20px;background:#eef2f6;color:#475467;font-size:11px;font-weight:700}.ok{background:#e8f6ef;color:var(--green)}.warn{background:#fff3df;color:var(--amber)}.blue{background:#edf2ff;color:#2449d8}.notice{padding:11px 13px;border-radius:8px;background:#fff4e5;color:#7a4700;margin:10px 0}.success{padding:11px 13px;border-radius:8px;background:#e8f6ef;color:#126644;margin:10px 0}
+button{font:inherit}.primary,.secondary,.ghost{border:0;border-radius:7px;padding:9px 12px;font-weight:650;cursor:pointer}.primary{background:var(--blue);color:white}.secondary{background:#eef2f6;color:#344054}.ghost{background:transparent;color:#315efb;padding:5px}
+label{display:block;font-size:12px;color:var(--muted);margin:10px 0 5px}input,select,textarea{width:100%;padding:9px 10px;border:1px solid #d0d5dd;border-radius:7px;background:white;color:var(--ink);font:inherit}textarea{min-height:65px}.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:9px}.full{grid-column:1/-1}.row{display:flex;align-items:center;gap:9px;flex-wrap:wrap}.between{justify-content:space-between}.step{display:flex;gap:9px;align-items:flex-start;margin:12px 0}.hidden{display:none!important}
+.modalback{position:fixed;inset:0;background:#10182888;display:none;align-items:center;justify-content:center;padding:16px;z-index:5}.modalback.open{display:flex}.modal{background:white;border-radius:13px;padding:20px;max-width:720px;width:100%;max-height:90vh;overflow:auto;box-shadow:0 20px 60px #0003}.modalhead{display:flex;justify-content:space-between;gap:12px}.close{border:0;background:#eef2f6;border-radius:7px;padding:5px 10px;cursor:pointer}.detailgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.detail{background:#f8fafc;border:1px solid var(--line);border-radius:8px;padding:10px}.detail b{display:block;font-size:11px;color:var(--muted);margin-bottom:4px}
+footer{text-align:center;color:var(--muted);font-size:11px;padding:17px}
+@media(max-width:760px){.grid{grid-template-columns:1fr 1fr}.two,.three{grid-template-columns:1fr}.rolebox{align-items:flex-end;flex-direction:column}}@media(max-width:500px){header{padding:13px}.formgrid,.detailgrid{grid-template-columns:1fr}.full{grid-column:auto}main{padding:0 10px}}
+ 
+.filterrow-dashboard{grid-template-columns:1.25fr 1fr 1fr 1fr 1.2fr;align-items:start}
+.filterrow-dashboard select[multiple]{height:auto;min-height:112px;padding:8px}
+.filterrow-dashboard small{display:block;margin-top:6px}
+.overview-kpis{margin-top:18px}
+.consumption-panel{margin-top:16px}
+.filters-panel{margin-top:18px}
+@media(max-width:900px){.filterrow-dashboard{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:560px){.filterrow-dashboard{grid-template-columns:1fr}}
+@media print{
+  body.print-overview *{visibility:hidden!important}
+  body.print-overview #overview,body.print-overview #overview *{visibility:visible!important}
+  body.print-overview #overview{display:block!important;position:absolute;left:0;top:0;width:100%;padding:0}
+  body.print-overview #overview button,body.print-overview .filters-panel{display:none!important}
+  body.print-overview .panel{break-inside:avoid;box-shadow:none}
+}
+</style></head>
+<body>
+<header><div><div class="brand">NGO FinanceFlow</div><div class="tag">Project budgets · expenditure approvals · finance integration</div></div><div class="rolebox"><label for="role" style="color:#dce5f2;margin:0">Demo role</label><select id="role"><option value="requester">Requester / Staff</option><option value="programme">Programme Officer</option><option value="management">Management</option><option value="finance">Finance Officer</option></select></div></header>
+<main>
+<nav class="tabs" id="tabs"></nav>
+<section class="page active" id="strategy">
+<div class="panel"><div class="row between"><div><h2>Project strategy & results framework</h2><p class="muted">A shared, read-only view for staff across the organisation. No budget figures are displayed here.</p></div><span class="pill blue">Staff access</span></div>
+<div class="card"><div class="k">PROJECT</div><h2 style="margin:4px 0">Project SUNRISE: Sustainable Urban Nourishment, Resilience & Inclusive Skills Exchange</h2><p class="muted">A fictional NGO initiative supporting resilient communities through practical skills, inclusive local partnerships and slightly over-ambitious impact statements.</p><div class="row"><span class="pill">Duration: 2026–2028</span><span class="pill">Geography: 3 regions</span><span class="pill">Lead: Community Futures Network</span></div></div>
+<h3>Logframe / Results Framework</h3>
+<div class="panel"><div class="pill blue">IMPACT</div><h3 style="margin-top:8px">Communities thrive in a world where nobody is left behind by the global transition to sustainable sandwich-making.</h3><p class="muted">Long-term change the project aims to contribute to.</p></div>
+<div class="two"><div class="panel"><div class="pill">OUTCOME 1</div><h3 style="margin-top:8px">Young people gain dignified livelihoods and the confidence to explain circular economy concepts at family gatherings.</h3><div class="step"><span class="pill blue">OUTPUT 1.1</span><div><b>Community skills hubs established</b><p class="muted">Activity 1.1.1 — Equip local learning hubs<br>Activity 1.1.2 — Train community facilitators</p></div></div><div class="step"><span class="pill blue">OUTPUT 1.2</span><div><b>Practical skills and employment pathways expanded</b><p class="muted">Activity 1.2.1 — Run skills workshops<br>Activity 1.2.2 — Organise employer meet-ups</p></div></div></div>
+<div class="panel"><div class="pill">OUTCOME 2</div><h3 style="margin-top:8px">Local organisations become more resilient, collaborative and 37% more likely to own a reusable meeting agenda.</h3><div class="step"><span class="pill blue">OUTPUT 2.1</span><div><b>Local partnerships strengthened</b><p class="muted">Activity 2.1.1 — Convene neighbourhood alliances<br>Activity 2.1.2 — Launch community micro-initiatives</p></div></div><div class="step"><span class="pill blue">OUTPUT 2.2</span><div><b>Environmental practices adopted</b><p class="muted">Activity 2.2.1 — Deliver repair and reuse events<br>Activity 2.2.2 — Pilot low-waste community kitchens</p></div></div></div></div>
+<div class="two"><div class="panel"><h3>Donor partners</h3><b>Northstar Foundation</b><p class="muted">Supports youth skills and community-led innovation. Its strategic priority is “turning potential into practical possibility”, preferably with measurable indicators.</p><b>Global Neighbourhood Fund</b><p class="muted">Funds inclusive local partnerships and resilient communities. Particularly interested in collaboration, sustainability and evidence that people actually attend the workshops.</p><b>European Green Horizons Facility</b><p class="muted">Supports circular economy, low-waste pilots and green skills. Requires clear project outputs and transparent expenditure reporting.</p></div><div class="panel"><h3>Project at a glance</h3><p><b>Purpose</b><br><span class="muted">Help local organisations and residents build practical skills, access opportunities and test sustainable community solutions.</span></p><p><b>Who benefits?</b><br><span class="muted">Young people, local NGOs, community groups, small enterprises and the occasional overworked project coordinator.</span></p><p><b>How we work</b><br><span class="muted">Training, partnerships, small pilots, peer learning and continuous feedback.</span></p></div></div>
+</div>
+</section>
+
+<section class="page" id="newrequest"><div class="panel"><h2>New expense request</h2><p class="muted">Submit a planned expense for Programme review. Budget amounts and financial consumption are not visible to Requesters.</p>
+<div class="formgrid"><div><label>Project / grant</label><select id="project"><option>Project SUNRISE · Northstar Foundation</option><option>Project SUNRISE · Global Neighbourhood Fund</option><option>Project SUNRISE · European Green Horizons Facility</option></select></div><div><label>Results Framework / Activity</label><select id="activity"><option>Outcome 1 → Output 1.2 → Activity 1.2.1 Skills workshops</option><option>Outcome 1 → Output 1.1 → Activity 1.1.2 Train facilitators</option><option>Outcome 2 → Output 2.1 → Activity 2.1.1 Neighbourhood alliances</option><option>Outcome 2 → Output 2.2 → Activity 2.2.1 Repair and reuse events</option></select></div>
+<div><label>What is the planned expense?</label><input id="description" placeholder="e.g. Venue hire for a skills workshop"></div><div><label>Estimated amount (EUR)</label><input id="amount" type="number" min="1" placeholder="e.g. 1,250"></div>
+<div class="full"><label>Suggested budget line</label><select id="line"><option>Training and workshop costs (suggested)</option><option>Travel and accommodation</option><option>Consultancy and facilitator fees</option><option>Equipment and supplies</option><option>Events and community engagement</option></select><small class="muted">The system suggests a category based on the Activity and description. Programme Officer validates the selection before approval.</small></div>
+<div class="full"><label>Purpose / justification</label><textarea id="justification" placeholder="Briefly explain why this expense is needed"></textarea></div></div>
+<div id="reqmsg" class="notice">After submission, the request will appear in the Programme Officer approval queue.</div><button class="primary" id="submitReq">Submit to Programme</button></div></section>
+
+<section class="page" id="myrequests"><div class="panel"><h2>My expense requests</h2><p class="muted">Only requests submitted by the currently signed-in user appear here. Requests from other staff are visible in the Programme approvals queue, not in this personal list.</p><table id="myTable"><tr><th>Request</th><th>Activity</th><th>Amount</th><th>Status</th><th>Next step</th></tr></table><div id="myEmpty" class="empty">You have not submitted any expense requests yet.</div></div></section>
+
+<section class="page" id="overview"><div class="panel">
+<div class="row between"><div><h2>Budget overview</h2><p class="muted">A complete picture of the selected project's budget consumption. Project SUNRISE is one illustrative project, not an organisation-wide total. Use the Project / Donor and Results Framework filters below to explore the data.</p></div><div class="row"><span class="pill blue">Programme & Management only</span><button class="secondary" type="button" onclick="exportOverviewPDF()">Export to PDF</button></div></div>
+
+<div class="grid overview-kpis">
+<div class="card"><div class="k">Approved project budget</div><div class="v" id="dashBudget">€480,000</div><small>Budget for selected scope</small></div>
+<div class="card"><div class="k">Actual expenditure · ERP</div><div class="v" id="dashActual">€286,400</div><small>Posted transactions imported from finance system</small></div>
+<div class="card"><div class="k">Approved expenditures · unpaid</div><div class="v" id="dashCommitted">€42,600</div><small>Approved requests reserving budget</small></div>
+<div class="card"><div class="k">Available budget</div><div class="v" id="dashAvailable">€151,000</div><small id="dashAvailableNote">Budget less actual and approved unpaid</small></div></div>
+
+<div class="panel consumption-panel"><div class="row between"><h3>Budget consumption</h3><span class="pill" id="consumptionPct">68.5% committed</span></div><div class="chartbar"><span class="actual" id="actualSegment" style="width:59.7%"></span><span class="approved" id="approvedSegment" style="width:8.9%"></span></div><div class="legend"><span><i class="dot" style="background:#315efb"></i>Actual expenditure (ERP)</span><span><i class="dot" style="background:#f3b34c"></i>Approved, not yet paid</span><span><i class="dot" style="background:#edf0f4"></i>Available</span></div><p class="muted" id="chartCaption">Combined exposure = actual ERP expenditure + approved unpaid requests. Pending, unapproved requests do not reserve budget.</p></div>
+
+<div class="panel filters-panel"><div class="row between"><div><h3>Adjust your analysis</h3><p class="muted">The dashboard above shows the whole project by default. Select one or more items to narrow the view. Use Ctrl (Windows) or Cmd (Mac) to select multiple items.</p></div><button class="secondary" type="button" onclick="resetDashboardFilters()">Reset filters</button></div>
+<div class="filterrow filterrow-dashboard">
+<div><label>Project / Donor</label><select id="dashProjectDonor" multiple size="5"><option value="sunrise|northstar" selected>Project SUNRISE — Northstar Foundation</option><option value="sunrise|gnf" selected>Project SUNRISE — Global Neighbourhood Fund</option><option value="sunrise|green" selected>Project SUNRISE — European Green Horizons Facility</option><option value="sunrise|local" selected>Project SUNRISE — Local Partnerships Fund</option></select><small class="muted">Select one or more Project / Donor combinations. No selection = all combinations.</small></div>
+<div><label>Impact</label><select id="dashImpact" multiple size="3"><option value="impact1">Impact 1 — Resilient communities</option></select><small class="muted">No selection = all impacts.</small></div>
+<div><label>Outcome</label><select id="dashOutcome" multiple size="4"><option value="outcome1">Outcome 1 — Skills and livelihoods</option><option value="outcome2">Outcome 2 — Circular local systems</option></select><small class="muted">Options depend on selected Impact(s).</small></div>
+<div><label>Output</label><select id="dashOutput" multiple size="5"><option value="output11">Output 1.1 — Training design</option><option value="output12">Output 1.2 — Skills workshops</option><option value="output21">Output 2.1 — Local repair hubs</option><option value="output22">Output 2.2 — Repair and reuse</option></select><small class="muted">Options depend on selected Outcome(s).</small></div>
+<div><label>Analysis view</label><select id="dashView"><option value="combined">Combined: actual + approved, unpaid</option><option value="actual">Actual expenditure (ERP)</option><option value="approved">Approved expenditures (not yet paid)</option></select></div></div>
+<p class="muted">Results Framework filters follow the hierarchy: Impact → Outcome → Output. Selecting Outcome 1 exposes its two Outputs; selecting Outcome 2 exposes its two Outputs. Selecting both Outcomes exposes all four. Project / Donor is one combined filter dimension; its selection is combined with the Results Framework filters to narrow the same budget data.</p></div>
+
+<div class="two"><div class="panel"><h3>Consumption by funding source</h3><table id="donorTable"><tr><th>Donor</th><th>Budget</th><th>Actual</th><th>Approved unpaid</th><th>Available*</th></tr></table></div><div class="panel"><h3>Programme attention points</h3><div class="step"><span class="pill warn">Monitor</span><div><b>Activity nearing budget ceiling</b><div class="muted">Skills workshops — illustrative 92% consumption</div></div></div><div class="step"><span class="pill blue">Approval</span><div><b id="pendingLabel">3 expense requests</b><div class="muted">Waiting for Programme decision</div></div></div><div class="step"><span class="pill warn">Reconciliation</span><div><b>2 unmatched transactions</b><div class="muted">Imported from finance system</div></div></div></div></div></div></section>
+
+<section class="page" id="approvals"><div class="panel"><div class="row between"><div><h2>Programme approval queue</h2><p class="muted">Select a request to inspect its details before making a decision.</p></div><span class="pill warn" id="queueCount">3 pending</span></div><table id="approvalTable"><tr><th>Request ID</th><th>Requester</th><th>Activity</th><th>Amount</th><th>Status</th><th>Details</th></tr>
+<tr data-id="REQ-308"><td>REQ-308</td><td>Alex Morgan</td><td>Skills workshops</td><td>€1,250</td><td><span class="pill warn">Pending</span></td><td><button class="secondary" onclick="openRequest('REQ-308')">View request</button></td></tr>
+<tr data-id="REQ-309"><td>REQ-309</td><td>Samira Patel</td><td>Train facilitators</td><td>€2,400</td><td><span class="pill warn">Pending</span></td><td><button class="secondary" onclick="openRequest('REQ-309')">View request</button></td></tr>
+<tr data-id="REQ-310"><td>REQ-310</td><td>Jordan Lee</td><td>Repair & reuse event</td><td>€860</td><td><span class="pill warn">Pending</span></td><td><button class="secondary" onclick="openRequest('REQ-310')">View request</button></td></tr></table></div>
+<div class="panel"><h3>What Programme verifies</h3><div class="three"><div><b>Purpose & relevance</b><p class="muted">Does the request support the selected project Activity?</p></div><div><b>Budget coding</b><p class="muted">Is the selected Results Framework and suggested budget line appropriate?</p></div><div><b>Availability & eligibility</b><p class="muted">Is there sufficient budget and is the cost eligible under the grant?</p></div></div></div></section>
+
+<section class="page" id="finance"><div class="panel"><div class="row between"><div><h2>Finance processing & reconciliation</h2><p class="muted">Finance-only workspace. Receives Programme-approved requests with supporting invoices.</p></div><span class="pill blue">Finance access</span></div>
+<div class="notice">Programme approval confirms the programme purpose and budget coding. Finance performs its own document, supplier and payment controls in the organisation's finance system.</div>
+<table id="financeTable"><tr><th>Request</th><th>Approved amount</th><th>Invoice</th><th>Finance status</th><th>Action</th></tr><tr><td>REQ-301 · Venue hire</td><td>€1,250</td><td>venue_invoice.pdf</td><td><span class="pill blue">Ready for Finance</span></td><td><button class="secondary" onclick="markPosted(this)">Mark paid / posted</button></td></tr><tr><td>REQ-302 · Training materials</td><td>€900</td><td>materials_invoice.pdf</td><td><span class="pill warn">Finance checking</span></td><td><button class="secondary" onclick="markPosted(this)">Mark paid / posted</button></td></tr></table>
+<h3 style="margin-top:18px">ERP reconciliation</h3><p class="muted">After payment and posting, the finance system sends transaction details back to FinanceFlow. The module matches the transaction to the approved request and updates actual expenditure.</p>
+<table id="recon"><tr><th>ERP transaction</th><th>Amount</th><th>Linked request</th><th>Reconciliation</th></tr><tr><td>ERP-88214</td><td>€1,250</td><td>REQ-301</td><td><span class="pill ok">Reconciled</span></td></tr><tr><td>ERP-88219</td><td>€900</td><td>REQ-302</td><td><span class="pill warn">Awaiting match</span></td></tr></table><button class="secondary" id="sync">Simulate ERP sync</button> <small id="syncmsg">Sample data · no live integration</small></div></section>
+</main>
+<div class="modalback" id="modal"><div class="modal"><div class="modalhead"><div><span class="pill blue">EXPENSE REQUEST DETAIL</span><h2 id="modalTitle" style="margin-top:8px">REQ-308</h2></div><button class="close" onclick="closeModal()">Close</button></div><div class="detailgrid" id="modalDetails"></div><div id="modalDecision" class="row" style="margin-top:16px"></div><div id="returnCommentBox" class="hidden"><label for="returnComment">Reason for returning this request (required)</label><textarea id="returnComment" placeholder="Explain what needs to be corrected, e.g. review the Activity selection or provide a clearer justification."></textarea><div class="row" style="margin-top:9px"><button class="primary" id="confirmReturn">Send back with comment</button><button class="secondary" onclick="cancelReturn()">Cancel</button></div></div></div></div>
+<footer>Self-initiated product concept · Fictional NGO and donor data · No live ERP or payment integration</footer>
+<script>
+const role=document.getElementById('role'),tabs=document.getElementById('tabs');let pending=3;let requests={
+'REQ-308':{person:'Alex Morgan',project:'Project SUNRISE · Northstar Foundation',activity:'Impact → Outcome 1 → Output 1.2 → Activity 1.2.1: Skills workshops',description:'Venue hire and basic AV equipment for a two-day skills workshop',amount:'€1,250',line:'Training and workshop costs (requester selection)',why:'Workshop for 25 young participants to develop practical repair and reuse skills.',status:'Pending'},
+'REQ-309':{person:'Samira Patel',project:'Project SUNRISE · Global Neighbourhood Fund',activity:'Impact → Outcome 1 → Output 1.1 → Activity 1.1.2: Train facilitators',description:'External facilitator fees for training local hub coordinators',amount:'€2,400',line:'Consultancy and facilitator fees (system suggestion)',why:'Specialist support for the first facilitator training cohort.',status:'Pending'},
+'REQ-310':{person:'Jordan Lee',project:'Project SUNRISE · European Green Horizons Facility',activity:'Impact → Outcome 2 → Output 2.2 → Activity 2.2.1: Repair and reuse events',description:'Materials and venue for a community repair event',amount:'€860',line:'Events and community engagement (requester selection)',why:'Community event demonstrating repair and reuse practices.',status:'Pending'}
+};
+
+function syncApprovalRow(id){
+ const r=requests[id];if(!r)return;
+ let row=document.querySelector(`#approvalTable tr[data-id="${id}"]`);
+ if(!row){row=document.createElement('tr');row.dataset.id=id;document.getElementById('approvalTable').appendChild(row);}
+ row.innerHTML='';
+ [id,r.person,r.activity,r.amount].forEach(value=>{const td=document.createElement('td');td.textContent=value;row.appendChild(td);});
+ const statusCell=document.createElement('td');const pill=document.createElement('span');pill.className='pill '+(r.status==='Programme approved'?'ok':r.status==='Pending'?'warn':'');pill.textContent=r.status;statusCell.appendChild(pill);row.appendChild(statusCell);
+ const actionCell=document.createElement('td');const btn=document.createElement('button');btn.className='secondary';btn.textContent='View request';btn.onclick=()=>openRequest(id);actionCell.appendChild(btn);row.appendChild(actionCell);
+}
+
+const configs={
+requester:[['strategy','Strategy & project logframe'],['newrequest','New expense request'],['myrequests','My requests']],
+programme:[['overview','Overview'],['approvals','Programme approvals'],['strategy','Strategy & project logframe'],['newrequest','New expense request'],['myrequests','My requests']],
+management:[['overview','Overview'],['strategy','Strategy & project logframe']],
+finance:[['finance','Finance processing & reconciliation'],['strategy','Strategy & project logframe']]
+};
+function renderRole(){tabs.innerHTML='';document.querySelectorAll('#myTable tr[data-owner]').forEach(r=>r.classList.toggle('hidden',r.dataset.owner!==role.value));let list=configs[role.value];list.forEach(([id,label],i)=>{let b=document.createElement('button');b.className='tab'+(i===0?' active':'');b.textContent=label;b.onclick=()=>go(id);tabs.appendChild(b)});document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id===list[0][0]));}
+function go(id){document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id===id));document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.textContent===configs[role.value].find(x=>x[0]===id)?.[1]));}
+role.onchange=renderRole;renderRole();
+let editingRequestId=null;
+window.editMyRequest=id=>{
+ const r=requests[id];if(!r||r.status!=='Returned for correction')return;
+ editingRequestId=id;
+ const project=document.getElementById('project');
+ Array.from(project.options).forEach(o=>o.selected=o.text===r.project);
+ const activity=document.getElementById('activity');
+ Array.from(activity.options).forEach(o=>o.selected=o.text===r.activity);
+ document.getElementById('description').value=r.description;
+ document.getElementById('amount').value=r.numericAmount||Number(String(r.amount).replace(/[^\d.]/g,''));
+ document.getElementById('line').value=r.line||'';
+ document.getElementById('justification').value=r.why||'';
+ const btn=document.getElementById('submitReq');btn.textContent='Save changes and resubmit';
+ document.getElementById('reqmsg').className='notice';
+ document.getElementById('reqmsg').textContent='You are editing '+id+'. Review the Programme feedback in My requests, make the necessary changes, then resubmit.';
+ go('newrequest');
+};
+document.getElementById('submitReq').onclick=()=>{
+ let d=document.getElementById('description').value.trim(),a=Number(document.getElementById('amount').value);
+ if(!d||a<=0){document.getElementById('reqmsg').className='notice';document.getElementById('reqmsg').textContent='Please enter an expense description and a valid estimated amount.';return;}
+ let projectLabel=document.getElementById('project').selectedOptions[0].text;
+ let activityLabel=document.getElementById('activity').selectedOptions[0].text;
+ if(editingRequestId){
+  const id=editingRequestId,r=requests[id];
+  r.project=projectLabel;r.activity=activityLabel;r.description=d;r.amount='€'+a.toLocaleString('en-US');r.numericAmount=a;r.line=document.getElementById('line').value;r.why=document.getElementById('justification').value||'No additional justification provided.';r.status='Pending';r.comment='';
+  const approval=document.querySelector(`#approvalTable tr[data-id="${id}"]`);
+  if(approval){approval.children[2].textContent=activityLabel;approval.children[3].textContent=r.amount;approval.children[4].innerHTML='<span class="pill warn">Pending</span>';approval.children[4].title='';}
+  syncApprovalRow(id);
+  const mine=document.querySelector(`#myTable tr[data-id="${id}"]`);
+  if(mine){mine.children[0].textContent=id+' · '+d;mine.children[1].textContent=activityLabel;mine.children[2].textContent=r.amount;mine.children[3].innerHTML='<span class="pill warn">Pending Programme approval</span>';mine.children[4].textContent='Resubmitted — awaiting Programme review';}
+  editingRequestId=null;document.getElementById('submitReq').textContent='Submit to Programme';
+  document.getElementById('reqmsg').className='success';document.getElementById('reqmsg').textContent='Changes saved. '+id+' has been resubmitted to Programme for review.';
+  pending++;let pm=document.getElementById('pendingMetric');if(pm)pm.textContent=pending;let pl=document.getElementById('pendingLabel');if(pl)pl.textContent=pending+' expense requests';let qc=document.getElementById('queueCount');if(qc)qc.textContent=pending+' pending';
+  go('myrequests');return;
+ }
+ let id='REQ-'+(311+Object.keys(requests).length-3);
+ requests[id]={person:role.value==='programme'?'Programme Officer (current user)':'Current staff user',owner:role.value,project:projectLabel,activity:activityLabel,description:d,amount:'€'+a.toLocaleString('en-US'),numericAmount:a,line:document.getElementById('line').value,why:document.getElementById('justification').value||'No additional justification provided.',status:'Pending'};
+ document.getElementById('reqmsg').className='success';document.getElementById('reqmsg').textContent='Request '+id+' submitted. It is now awaiting Programme review.';
+ let tr=document.createElement('tr');tr.dataset.id=id;tr.innerHTML=`<td>${id}</td><td>${requests[id].person}</td><td>${activityLabel}</td><td>€${a.toLocaleString('en-US')}</td><td><span class="pill warn">Pending</span></td><td><button class="secondary" onclick="openRequest('${id}')">View request</button></td>`;document.getElementById('approvalTable').appendChild(tr);syncApprovalRow(id);
+ if(requests[id].owner===role.value){let own=document.createElement('tr');own.dataset.id=id;own.dataset.owner=role.value;own.innerHTML=`<td>${id} · ${d.replace(/[<>&"]/g,'')}</td><td>${activityLabel}</td><td>€${a.toLocaleString('en-US')}</td><td><span class="pill warn">Pending Programme approval</span></td><td>Awaiting Programme review</td>`;document.getElementById('myTable').appendChild(own);document.getElementById('myEmpty').classList.add('hidden');}
+ pending++;let pm=document.getElementById('pendingMetric');if(pm)pm.textContent=pending;let pl=document.getElementById('pendingLabel');if(pl)pl.textContent=pending+' expense requests';let qc=document.getElementById('queueCount');if(qc)qc.textContent=pending+' pending';
+};
+let activeRequestId=null;
+window.openRequest=id=>{let r=requests[id];if(!r)return;activeRequestId=id;document.getElementById('modalTitle').textContent=id;let fields=[['Requester',r.person],['Project / grant',r.project],['Results Framework selection',r.activity],['Expense description',r.description],['Requested amount',r.amount],['Budget line',r.line],['Justification',r.why],['Status',r.status]];document.getElementById('modalDetails').innerHTML=fields.map(([k,v])=>`<div class="detail"><b>${k}</b>${String(v).replace(/[<>&"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]))}</div>`).join('');let actions=document.getElementById('modalDecision');actions.innerHTML='';document.getElementById('returnCommentBox').classList.add('hidden');if(r.status==='Pending'){actions.innerHTML=`<button class="primary" onclick="setDecision('${id}','Programme approved')">Approve request</button><button class="secondary" onclick="showReturnComment()">Return for correction</button>`;}else actions.innerHTML='<span class="pill ok">'+r.status+'</span>';document.getElementById('modal').classList.add('open');};
+window.showReturnComment=()=>{document.getElementById('returnCommentBox').classList.remove('hidden');document.getElementById('returnComment').focus();};
+window.cancelReturn=()=>document.getElementById('returnCommentBox').classList.add('hidden');
+document.getElementById('confirmReturn').onclick=()=>{let c=document.getElementById('returnComment').value.trim();if(!c){document.getElementById('returnComment').style.borderColor='#b42318';return;}setDecision(activeRequestId,'Returned for correction',c);};
+window.closeModal=()=>document.getElementById('modal').classList.remove('open');
+window.setDecision=(id,status,comment='')=>{requests[id].status=status;requests[id].comment=comment;let row=document.querySelector(`#approvalTable tr[data-id="${id}"]`);if(row){row.children[4].innerHTML='<span class="pill '+(status==='Programme approved'?'ok':'warn')+'">'+status+'</span>';row.children[4].title=comment;}let mine=document.querySelector(`#myTable tr[data-id="${id}"]`);if(mine){mine.children[3].innerHTML='<span class="pill '+(status==='Programme approved'?'ok':'warn')+'">'+status+'</span>';if(status==='Programme approved'){mine.children[4].innerHTML='You can upload the invoice when it is available. <button class="secondary" onclick="uploadInvoice(this)">Upload invoice</button>';}else if(status==='Returned for correction'){mine.children[4].innerHTML='<div class="feedback"><b>Programme feedback:</b> '+String(comment||'Please review and correct the request.').replace(/[<>&"]/g,ch=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[ch]))+'</div><button class="secondary" onclick="editMyRequest(\''+id+'\')">Edit request</button>';}else{mine.children[4].textContent='Awaiting Programme review';}}pending=Math.max(0,pending-1);let pm=document.getElementById('pendingMetric');if(pm)pm.textContent=pending;let pl=document.getElementById('pendingLabel');if(pl)pl.textContent=pending+' expense requests';let qc=document.getElementById('queueCount');if(qc)qc.textContent=pending+' pending';closeModal();};
+window.uploadInvoice=btn=>{let inp=document.createElement('input');inp.type='file';inp.accept='.pdf,.jpg,.png';inp.onchange=()=>{if(inp.files.length){btn.parentElement.innerHTML='Invoice attached: '+inp.files[0].name+' · awaiting Finance handover';}};inp.click();};
+window.markPosted=btn=>{btn.closest('tr').children[3].innerHTML='<span class="pill ok">Paid / posted</span>';btn.parentElement.innerHTML='Awaiting ERP reconciliation';};
+document.getElementById('sync').onclick=()=>{document.getElementById('syncmsg').textContent='Sync simulated at '+new Date().toLocaleTimeString()+' · demo transaction feed refreshed';};
+
+const donorBase=[
+ {donor:'northstar',name:'Northstar Foundation',budget:180000,actual:112000,approved:18500},
+ {donor:'gnf',name:'Global Neighbourhood Fund',budget:120000,actual:78400,approved:12600},
+ {donor:'green',name:'European Green Horizons Facility',budget:100000,actual:61000,approved:11500},
+ {donor:'local',name:'Local Partnerships Fund',budget:80000,actual:35000,approved:0}
+];
+const outputDefinitions=[
+ {impact:'impact1',outcome:'outcome1',output:'output11'},
+ {impact:'impact1',outcome:'outcome1',output:'output12'},
+ {impact:'impact1',outcome:'outcome2',output:'output21'},
+ {impact:'impact1',outcome:'outcome2',output:'output22'}
+];
+// Illustrative allocation: each donor's total is distributed evenly across the four sample Outputs.
+const dashData=donorBase.flatMap(d=>outputDefinitions.map(r=>({
+ project:'sunrise',donor:d.donor,name:d.name,impact:r.impact,outcome:r.outcome,output:r.output,
+ budget:d.budget/4,actual:d.actual/4,approved:d.approved/4
+})));
+function euro(n){return '€'+Number(n).toLocaleString('en-US',{maximumFractionDigits:0});}
+function selectedValues(id){return Array.from(document.getElementById(id).selectedOptions).map(o=>o.value);}
+function normaliseAllOption(id){
+ const el=document.getElementById(id),all=Array.from(el.options).find(o=>o.value==='all');
+ if(!all)return;
+ const explicit=Array.from(el.options).filter(o=>o.selected&&o.value!=='all');
+ if(explicit.length)all.selected=false;
+ else all.selected=true;
+}
+function setOptionsFor(id,items,labels){
+ const el=document.getElementById(id),previous=selectedValues(id);
+ el.innerHTML='';
+ items.forEach(v=>{const o=document.createElement('option');o.value=v;o.textContent=labels[v];el.appendChild(o);});
+ const validPrevious=previous.filter(v=>items.includes(v));
+ if(validPrevious.length){Array.from(el.options).forEach(o=>o.selected=validPrevious.includes(o.value));}
+}
+function updateRFTree(){
+ const impactValues=selectedValues('dashImpact');
+ const impactScope=impactValues.length?impactValues:outputDefinitions.map(x=>x.impact).filter((v,i,a)=>a.indexOf(v)===i);
+ const availableOutcomes=[...new Set(outputDefinitions.filter(x=>impactScope.includes(x.impact)).map(x=>x.outcome))];
+ const outcomeLabels={outcome1:'Outcome 1 — Skills and livelihoods',outcome2:'Outcome 2 — Circular local systems'};
+ setOptionsFor('dashOutcome',availableOutcomes,outcomeLabels);
+ const chosenOutcomes=selectedValues('dashOutcome');
+ const outcomeScope=chosenOutcomes.length?chosenOutcomes:availableOutcomes;
+ const availableOutputs=[...new Set(outputDefinitions.filter(x=>impactScope.includes(x.impact)&&outcomeScope.includes(x.outcome)).map(x=>x.output))];
+ const outputLabels={output11:'Output 1.1 — Training design',output12:'Output 1.2 — Skills workshops',output21:'Output 2.1 — Local repair hubs',output22:'Output 2.2 — Repair and reuse'};
+ setOptionsFor('dashOutput',availableOutputs,outputLabels);
+}
+function updateDashboard(){
+ const pd=selectedValues('dashProjectDonor');
+ const projectDonorPairs=pd;
+ const impacts=selectedValues('dashImpact');
+ const outcomes=selectedValues('dashOutcome');
+ const outputs=selectedValues('dashOutput');
+ const view=document.getElementById('dashView').value;
+ // Project / Donor is one combined filter dimension.
+ let rows=dashData.filter(x=>
+   (!projectDonorPairs.length||projectDonorPairs.includes(x.project+'|'+x.donor))&&
+   (!impacts.length||impacts.includes(x.impact))&&
+   (!outcomes.length||outcomes.includes(x.outcome))&&
+   (!outputs.length||outputs.includes(x.output))
+ );
+ const budget=rows.reduce((a,x)=>a+x.budget,0);
+ const actual=rows.reduce((a,x)=>a+x.actual,0);
+ const approved=rows.reduce((a,x)=>a+x.approved,0);
+ const counted=view==='actual'?actual:view==='approved'?approved:actual+approved;
+ const available=Math.max(0,budget-counted);
+ const pct=budget?Math.min(100,counted/budget*100):0;
+ document.getElementById('dashBudget').textContent=euro(budget);
+ document.getElementById('dashActual').textContent=euro(actual);
+ document.getElementById('dashCommitted').textContent=euro(approved);
+ document.getElementById('dashAvailable').textContent=euro(available);
+ document.getElementById('dashAvailableNote').textContent=view==='actual'?'Budget less actual expenditure':view==='approved'?'Budget less approved unpaid requests':'Budget less actual and approved unpaid';
+ document.getElementById('consumptionPct').textContent=pct.toFixed(1)+'% '+(view==='actual'?'actual':view==='approved'?'approved unpaid':'committed');
+ const ap=budget?actual/budget*100:0,pp=budget?approved/budget*100:0;
+ document.getElementById('actualSegment').style.width=(view==='approved'?0:ap)+'%';
+ document.getElementById('approvedSegment').style.width=(view==='actual'?0:pp)+'%';
+ document.getElementById('chartCaption').textContent=view==='actual'?'Showing only posted ERP expenditure. Approved unpaid requests are excluded.':view==='approved'?'Showing only Programme-approved requests not yet paid or posted. Actual ERP expenditure is excluded.':'Combined exposure = actual ERP expenditure + approved unpaid requests. Pending, unapproved requests do not reserve budget.';
+ const table=document.getElementById('donorTable');
+ table.innerHTML='<tr><th>Donor</th><th>Budget</th><th>Actual</th><th>Approved unpaid</th><th>Available*</th></tr>';
+ const byDonor={};
+ rows.forEach(x=>{
+   if(!byDonor[x.donor])byDonor[x.donor]={name:x.name,budget:0,actual:0,approved:0};
+   byDonor[x.donor].budget+=x.budget;byDonor[x.donor].actual+=x.actual;byDonor[x.donor].approved+=x.approved;
+ });
+ Object.values(byDonor).forEach(x=>{
+   const used=view==='actual'?x.actual:view==='approved'?x.approved:x.actual+x.approved;
+   const tr=document.createElement('tr');
+   tr.innerHTML=`<td>${x.name}</td><td>${euro(x.budget)}</td><td>${euro(x.actual)}</td><td>${euro(x.approved)}</td><td>${euro(Math.max(0,x.budget-used))}</td>`;
+   table.appendChild(tr);
+ });
+ if(!rows.length)table.innerHTML+='<tr><td colspan="5">No budget data for this filter combination.</td></tr>';
+}
+function resetDashboardFilters(){
+ const pd=document.getElementById('dashProjectDonor');
+ Array.from(pd.options).forEach(o=>o.selected=true);
+ ['dashImpact','dashOutcome','dashOutput'].forEach(id=>Array.from(document.getElementById(id).options).forEach(o=>o.selected=false));
+ document.getElementById('dashView').value='combined';
+ updateRFTree();updateDashboard();
+}
+function exportOverviewPDF(){document.body.classList.add('print-overview');window.print();document.body.classList.remove('print-overview');}
+document.getElementById('dashImpact').addEventListener('change',()=>{updateRFTree();updateDashboard();});
+document.getElementById('dashOutcome').addEventListener('change',()=>{updateRFTree();updateDashboard();});
+['dashProjectDonor','dashOutput','dashView'].forEach(id=>document.getElementById(id).addEventListener('change',updateDashboard));
+updateRFTree();updateDashboard();
+</script></body></html>
